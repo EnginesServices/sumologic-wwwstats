@@ -15,8 +15,71 @@
         "level": "alpha",
         "patch": 0
       }
-    }
+    },
+    "software": {
+      "display": {
+        "title": "SumoLogic WWW log analysis",
+        "label": "wwwstats"
+      }
+    },
+    "timestamp": "2017-11-20T13:06:49+11:00"
   },
   "software": {
+    "base": {
+      "name": "wwwstats",
+      "publisher_namespace": "SumoLogic",
+      "type_path": "wwwstats",
+      "service_handle_field": "parent_engine",
+      "parent_image": "engines/sumologic",
+      "run_as_user": "syslog",
+      "deployment_type": "worker",
+      "memory": {
+        "required": 260,
+        "recommended": 300
+      },
+      "persistent": true,
+      "attach_post_build": true
+    },
+    "service_configurations": [
+      {
+        "publisher_namespace": "EnginesSystem",
+        "type_path": "filesystem/local/filesystem",
+        "variables": {
+          "service_name": "weblogs",
+          "volume_src": "/var/log/engines/services/wap/nginx/",
+          "engine_path": " /var/log/www/",
+          "permissions": "ro",
+          "user": "",
+          "group": ""
+        }
+      }
+    ],
+    "constants": [
+      {
+        "name": "collector_name",
+        "value": "www-logs"
+      }
+    ],
+    "template_files": [
+      {
+        "path": "/home/sumo-sources.json",
+        "language": "text",
+        "content": "{\r\n  \"api.version\": \"v1\",\r\n  \"sources\": [\r\n    {\r\n      \"sourceType\" : \"LocalFile\",\r\n      \"name\": \"localfile-collector-container\",\r\n      \"pathExpression\": \"/var/log/www/**\",\r\n      \"multilineProcessingEnabled\": false,\r\n      \"automaticDateParsing\": true,\r\n      \"forceTimeZone\": false,\r\n      \"category\": \"apache_apps_logs\"\r\n    }\r\n\t]\r\n}"
+      }
+    ],
+    "configurators": [
+      {
+        "name": "collector_credentials",
+        "label": "Collector Credentials",
+        "set_script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n\r\ncat - >/home/engines/scripts/configurators/saved/credentials\r\n. /home/engines/functions/params_to_env.sh\r\nPARAMS_FILE=/home/engines/scripts/configurators/saved/credentials\r\nparms_to_file_and_env\r\nexit 0"
+        },
+        "read_script": {
+          "language": "sh",
+          "content": "#!/bin/bash\r\n\r\nif test -f /home/engines/scripts/configurators/saved/credentials\r\n\tthen\r\n\t\tcat /home/engines/scripts/configurators/saved/credentials\r\n\telse\r\n\techo '{\"access_id\":\"Not set\",\"access_key\":\"Not Saved\"}'\r\n\r\nfi\r\n\r\nexit 0"
+        }
+      }
+    ]
   }
 }
