@@ -22,7 +22,7 @@
         "label": "wwwstats"
       }
     },
-    "timestamp": "2017-11-20T13:06:49+11:00"
+    "timestamp": "2017-11-20T13:23:03+11:00"
   },
   "software": {
     "base": {
@@ -71,6 +71,31 @@
       {
         "name": "collector_credentials",
         "label": "Collector Credentials",
+        "variables": [
+          {
+            "name": "access_id",
+            "input": {
+              "type": "string",
+              "label": "Access ID"
+            }
+          },
+          {
+            "name": "access_key",
+            "mandatory": true,
+            "input": {
+              "type": "string",
+              "label": "Access key"
+            }
+          },
+          {
+            "name": "collector_name",
+            "input": {
+              "type": "string",
+              "label": "Collector name",
+              "title": "Defaults to service name"
+            }
+          }
+        ],
         "set_script": {
           "language": "sh",
           "content": "#!/bin/bash\r\n\r\ncat - >/home/engines/scripts/configurators/saved/credentials\r\n. /home/engines/functions/params_to_env.sh\r\nPARAMS_FILE=/home/engines/scripts/configurators/saved/credentials\r\nparms_to_file_and_env\r\nexit 0"
